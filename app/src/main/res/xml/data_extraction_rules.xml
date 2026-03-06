@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude auth tokens and credentials -->
+        <exclude domain="sharedpref" path="auth.preferences_pb" />
+        <!-- Exclude meal photos (large files) -->
+        <exclude domain="file" path="meals/" />
+    </cloud-backup>
+    <device-transfer>
+        <!-- Meal photos can transfer to new device -->
+        <include domain="file" path="meals/" />
+    </device-transfer>
+</data-extraction-rules>

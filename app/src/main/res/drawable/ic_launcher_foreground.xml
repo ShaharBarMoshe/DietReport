@@ -1,0 +1,79 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Plate (circle) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+    <!-- Plate inner ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,54m-17,0a17,17 0,1 1,34 0a17,17 0,1 1,-34 0"
+        android:strokeWidth="0.8"
+        android:strokeColor="#E0E0E0" />
+    <!-- Fork (left) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="2.2"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M26,34L26,74" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M22,34L22,46" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M26,34L26,46" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M30,34L30,46" />
+    <!-- Fork cross bar -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M21,46L31,46L31,50C31,52 29,54 26,54C23,54 21,52 21,50Z" />
+    <!-- Knife (right) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="2.2"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M82,54L82,74" />
+    <!-- Knife blade -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M80,34C80,34 80,54 80,54L84,54C84,54 84,34 84,34C84,32 82,30 82,30C82,30 80,32 80,34Z" />
+    <!-- Leaf accent (health/diet symbol) on the plate -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M54,44C54,44 48,50 48,54C48,58 50.7,60 54,60C57.3,60 60,58 60,54C60,50 54,44 54,44Z" />
+    <!-- Leaf vein -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="0.7"
+        android:strokeColor="#388E3C"
+        android:strokeLineCap="round"
+        android:pathData="M54,46L54,58" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="0.5"
+        android:strokeColor="#388E3C"
+        android:strokeLineCap="round"
+        android:pathData="M54,50L50,53" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="0.5"
+        android:strokeColor="#388E3C"
+        android:strokeLineCap="round"
+        android:pathData="M54,52L58,55" />
+</vector>

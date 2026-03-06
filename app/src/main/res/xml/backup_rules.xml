@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude auth tokens and credentials from cloud backup -->
+    <exclude domain="sharedpref" path="auth.preferences_pb" />
+    <!-- Meal photos are large; exclude from backup to keep backup size small -->
+    <exclude domain="file" path="meals/" />
+</full-backup-content>

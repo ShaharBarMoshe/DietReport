@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "skills": {
+    "android-kotlin": {
+      "source": "alinaqi/claude-bootstrap",
+      "sourceType": "github",
+      "computedHash": "08562cabf7a3afb5c10800334a4b4bbb99cdc88773f6bb63d55ac924c3160489"
+    },
+    "android-testing": {
+      "source": "new-silvermoon/awesome-android-agent-skills",
+      "sourceType": "github",
+      "computedHash": "744cd26fe4f2b741f86a93d20e72b27399edd8aef8345e908aceae9df37c278c"
+    },
+    "architecture-blueprint-generator": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "9b20f13d1d96ba1c2550e1ce535f932e943c42939d3fae906a9e0d6c1bfb471a"
+    },
+    "mobile-android-design": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "03ea37d709b89168792e8ea59e1344cf0b695967d2c66651011fa99bc36ef6e4"
+    },
+    "security-best-practices": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "computedHash": "c27616fb4e27999605b90b261dc729784420c8d77bd1a98748384ffaa5b35704"
+    }
+  }
+}

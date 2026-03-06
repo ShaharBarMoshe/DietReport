@@ -1,0 +1,63 @@
+# =====================
+# Android / Gradle
+# =====================
+.gradle/
+build/
+**/build/
+local.properties
+*.iml
+
+# APKs, AABs, and mapping files
+*.apk
+*.aab
+*.ap_
+*.dex
+proguard/
+
+# Generated sources
+gen/
+generated/
+
+# Native build
+.externalNativeBuild/
+.cxx/
+
+# =====================
+# Android Studio / IntelliJ IDEA
+# =====================
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetSelector.xml
+.idea/gradle.xml
+captures/
+
+# =====================
+# Signing — NEVER commit these
+# =====================
+keystore.properties
+*.jks
+*.keystore
+*.p12
+
+# =====================
+# OS generated files
+# =====================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =====================
+# Logs & temp files
+# =====================
+*.log
+*.tmp
+*.bak
+*.swp
