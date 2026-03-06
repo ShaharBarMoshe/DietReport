@@ -13,9 +13,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
 import com.diet.dietreport.data.db.AppDatabase
 import com.diet.dietreport.data.db.LogSource
 import com.diet.dietreport.data.db.ReminderSlot
@@ -54,12 +51,6 @@ class PhoneLockFlowTest {
             .executeShellCommand("pm grant ${context.packageName} android.permission.CAMERA")
             .close()
 
-        runBlocking {
-            AuthRepository(context.authDataStore).saveUser(
-                User("uid-test", "test@example.com", "Test User")
-            )
-        }
-
         testImageFile = File(context.filesDir, "meals/test_lock_meal.jpg")
             .also { it.parentFile?.mkdirs() }
         val bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
@@ -72,10 +63,7 @@ class PhoneLockFlowTest {
         scenario?.close()
         LogMealViewModelFactory.testFactory = null
         LockViewModelFactory.testFactory = null
-        runBlocking {
-            db.reminderSlotDao().deleteFrom(0L)
-            context.authDataStore.edit { it.clear() }
-        }
+        runBlocking { db.reminderSlotDao().deleteFrom(0L) }
         testImageFile.delete()
     }
 

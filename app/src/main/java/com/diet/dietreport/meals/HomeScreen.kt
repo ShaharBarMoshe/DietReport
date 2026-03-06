@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
@@ -48,7 +47,6 @@ private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onSignOut: () -> Unit,
     onNavigateToLogMeal: (slotId: Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -105,10 +103,6 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            TextButton(
-                onClick = onSignOut,
-                modifier = Modifier.semantics { contentDescription = "Sign out" },
-            ) { Text("Sign Out") }
         }
 
         if (uiState.slots.isEmpty()) {

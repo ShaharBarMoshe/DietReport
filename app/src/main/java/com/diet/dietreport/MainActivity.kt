@@ -18,7 +18,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,10 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.diet.dietreport.auth.AuthNavEvent
-import com.diet.dietreport.auth.AuthViewModel
-import com.diet.dietreport.auth.AuthViewModelFactory
-import com.diet.dietreport.auth.SignInScreen
 import com.diet.dietreport.lock.LockScreen
 import com.diet.dietreport.lock.LockViewModelFactory
 import com.diet.dietreport.settings.SettingsNavEvent
@@ -57,7 +52,6 @@ import kotlinx.coroutines.flow.first
 import com.diet.dietreport.ui.theme.DietReportTheme
 
 object Routes {
-    const val SIGN_IN = "sign_in"
     const val HOME = "home"
     const val SETTINGS = "settings"
     const val LOG_MEAL = "log_meal/{slotId}"
@@ -82,10 +76,6 @@ private val bottomNavItems = listOf(
 )
 
 class MainActivity : ComponentActivity() {
-
-    private val authViewModel: AuthViewModel by viewModels {
-        AuthViewModelFactory.create(application)
-    }
 
     private val settingsViewModel: SettingsViewModel by viewModels {
         SettingsViewModelFactory.create(application)
@@ -125,7 +115,6 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 val isLockScreen = currentDestination?.route == Routes.LOCK
-                val authState by authViewModel.uiState.collectAsState()
 
                 // Deep-link slot ID from notification "Log meal" action
                 val pendingSlotId: Long? = remember {
@@ -133,49 +122,29 @@ class MainActivity : ComponentActivity() {
                     if (intent?.getStringExtra("destination") == "log_meal" && slotId != -1L) slotId else null
                 }
 
-                // Handle navigation events emitted by sign-in / sign-out
+                // On startup: route to deep-link or check onboarding
                 LaunchedEffect(Unit) {
-                    authViewModel.navEvent.collect { event ->
-                        when (event) {
-                            AuthNavEvent.ToHome -> navController.navigate(Routes.HOME) {
-                                popUpTo(Routes.SIGN_IN) { inclusive = true }
-                            }
-                            AuthNavEvent.ToSettings -> navController.navigate(Routes.SETTINGS) {
-                                popUpTo(Routes.SIGN_IN) { inclusive = true }
-                            }
-                            AuthNavEvent.ToSignIn -> navController.navigate(Routes.SIGN_IN) {
-                                popUpTo(0) { inclusive = true }
+                    if (pendingSlotId != null) {
+                        navController.navigate(Routes.logMeal(pendingSlotId)) {
+                            popUpTo(Routes.HOME) { inclusive = true }
+                        }
+                    } else {
+                        val onboarded = SettingsRepository(application.settingsDataStore)
+                            .isOnboardingComplete.first()
+                        if (!onboarded) {
+                            navController.navigate(Routes.SETTINGS) {
+                                popUpTo(Routes.HOME) { inclusive = true }
                             }
                         }
                     }
                 }
 
-                // Handle navigation events from SettingsViewModel (e.g. first-save onboarding → Home)
+                // Handle navigation events from SettingsViewModel (first-save onboarding → Home)
                 LaunchedEffect(Unit) {
                     settingsViewModel.navEvent.collect { event ->
                         when (event) {
                             SettingsNavEvent.ToHome -> navController.navigate(Routes.HOME) {
                                 popUpTo(0) { inclusive = true }
-                            }
-                        }
-                    }
-                }
-
-                // On startup: if user is already stored, navigate to home/settings or deep-link
-                LaunchedEffect(authState.isInitialized) {
-                    if (authState.isInitialized && authState.user != null &&
-                        navController.currentBackStackEntry?.destination?.route == Routes.SIGN_IN
-                    ) {
-                        if (pendingSlotId != null) {
-                            navController.navigate(Routes.logMeal(pendingSlotId)) {
-                                popUpTo(Routes.SIGN_IN) { inclusive = true }
-                            }
-                        } else {
-                            val onboarded = SettingsRepository(application.settingsDataStore)
-                                .isOnboardingComplete.first()
-                            val target = if (onboarded) Routes.HOME else Routes.SETTINGS
-                            navController.navigate(target) {
-                                popUpTo(Routes.SIGN_IN) { inclusive = true }
                             }
                         }
                     }
@@ -211,14 +180,12 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = Routes.SIGN_IN,
+                        startDestination = Routes.HOME,
                         modifier = if (isLockScreen) Modifier else Modifier.padding(innerPadding)
                     ) {
-                        composable(Routes.SIGN_IN) { SignInScreen(authViewModel) }
                         composable(Routes.HOME) {
                             HomeScreen(
                                 viewModel = homeViewModel,
-                                onSignOut = { authViewModel.signOut() },
                                 onNavigateToLogMeal = { slotId ->
                                     navController.navigate(Routes.logMeal(slotId))
                                 },

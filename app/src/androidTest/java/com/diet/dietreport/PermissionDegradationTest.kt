@@ -9,9 +9,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
 import com.diet.dietreport.settings.data.settingsDataStore
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -35,13 +32,8 @@ class PermissionDegradationTest {
         device.pressHome()
         SchedulerErrorBus.clear()
 
-        // Pre-sign-in and mark onboarding complete so we start on HomeScreen
+        // Mark onboarding complete so startup routes to Home
         runBlocking {
-            context.authDataStore.edit { it.clear() }
-            AuthRepository(context.authDataStore).saveUser(
-                User("uid-perm-test", "perm@example.com", "Perm Test User")
-            )
-            // Mark onboarding complete so startup routes to Home
             context.settingsDataStore.edit { prefs ->
                 prefs[androidx.datastore.preferences.core.booleanPreferencesKey("onboarding_complete")] = true
             }
@@ -64,10 +56,7 @@ class PermissionDegradationTest {
             "appops set ${context.packageName} SCHEDULE_EXACT_ALARM allow"
         ).close()
         Thread.sleep(500)
-        runBlocking {
-            context.authDataStore.edit { it.clear() }
-            context.settingsDataStore.edit { it.clear() }
-        }
+        runBlocking { context.settingsDataStore.edit { it.clear() } }
     }
 
     @Test

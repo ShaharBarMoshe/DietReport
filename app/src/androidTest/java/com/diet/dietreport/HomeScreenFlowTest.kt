@@ -12,9 +12,6 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import androidx.datastore.preferences.core.edit
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
 import com.diet.dietreport.data.db.AppDatabase
 import com.diet.dietreport.settings.data.SettingsRepository
 import com.diet.dietreport.settings.data.settingsDataStore
@@ -54,9 +51,6 @@ class HomeScreenFlowTest {
         device.pressHome()
 
         runBlocking {
-            AuthRepository(context.authDataStore).saveUser(
-                User("uid-test", "test@example.com", "Test User")
-            )
             SettingsRepository(context.settingsDataStore).markOnboardingComplete()
         }
 
@@ -131,7 +125,6 @@ class HomeScreenFlowTest {
         LockViewModelFactory.testFactory = null
         runBlocking {
             db.reminderSlotDao().deleteFrom(0L)
-            context.authDataStore.edit { it.clear() }
             context.settingsDataStore.edit { it.clear() }
         }
         testImageFile.delete()

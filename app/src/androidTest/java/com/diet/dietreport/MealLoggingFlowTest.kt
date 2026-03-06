@@ -13,9 +13,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
 import com.diet.dietreport.data.db.AppDatabase
 import com.diet.dietreport.data.db.LogSource
 import com.diet.dietreport.data.db.ReminderSlot
@@ -52,13 +49,6 @@ class MealLoggingFlowTest {
         InstrumentationRegistry.getInstrumentation().uiAutomation
             .executeShellCommand("pm grant ${context.packageName} android.permission.CAMERA")
             .close()
-
-        // Sign in a test user so the app navigates past sign-in
-        runBlocking {
-            AuthRepository(context.authDataStore).saveUser(
-                User("uid-test", "test@example.com", "Test User")
-            )
-        }
 
         // Create a minimal 1×1 JPEG as the pre-loaded "captured" photo
         testImageFile = File(context.filesDir, "meals/test_meal.jpg")
@@ -101,10 +91,7 @@ class MealLoggingFlowTest {
     fun tearDown() {
         scenario?.close()
         LogMealViewModelFactory.testFactory = null
-        runBlocking {
-            db.reminderSlotDao().deleteFrom(0L)   // cascade-deletes meal_logs too
-            context.authDataStore.edit { it.clear() }
-        }
+        runBlocking { db.reminderSlotDao().deleteFrom(0L) }
         testImageFile.delete()
     }
 

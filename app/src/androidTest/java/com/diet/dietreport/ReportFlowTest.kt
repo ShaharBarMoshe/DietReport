@@ -10,9 +10,6 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
 import com.diet.dietreport.data.db.AppDatabase
 import com.diet.dietreport.data.db.ReminderSlot
 import com.diet.dietreport.data.db.SlotStatus
@@ -39,16 +36,7 @@ class ReportFlowTest {
     fun setUp() {
         device.pressHome()
 
-        runBlocking {
-            db.reminderSlotDao().deleteFrom(0L)
-            context.authDataStore.edit { it.clear() }
-        }
-
-        runBlocking {
-            AuthRepository(context.authDataStore).saveUser(
-                User("uid-test", "test@example.com", "Test User")
-            )
-        }
+        runBlocking { db.reminderSlotDao().deleteFrom(0L) }
 
         // Seed 7 days × 5 slots at hours 8, 11, 14, 17, 20
         // Hours 8, 11, 14 → SUCCESS (21 total = 60% of 35)
@@ -88,10 +76,7 @@ class ReportFlowTest {
     @After
     fun tearDown() {
         scenario?.close()
-        runBlocking {
-            db.reminderSlotDao().deleteFrom(0L)
-            context.authDataStore.edit { it.clear() }
-        }
+        runBlocking { db.reminderSlotDao().deleteFrom(0L) }
     }
 
     @Test

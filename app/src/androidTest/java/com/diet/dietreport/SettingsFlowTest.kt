@@ -9,9 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
+import com.diet.dietreport.settings.data.SettingsRepository
 import com.diet.dietreport.settings.data.settingsDataStore
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -29,19 +27,19 @@ class SettingsFlowTest {
 
     private val context = ApplicationProvider.getApplicationContext<Application>()
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-    private val presetUser = User("uid-test", "test@example.com", "Test User")
 
     private val setupRule = object : ExternalResource() {
         override fun before() {
-            device.pressHome() // ensure notification shade or other overlays are dismissed
+            device.pressHome()
             runBlocking {
                 context.settingsDataStore.edit { it.clear() }
-                AuthRepository(context.authDataStore).saveUser(presetUser)
+                // Mark onboarding complete so the app starts on HomeScreen
+                SettingsRepository(context.settingsDataStore).markOnboardingComplete()
             }
         }
 
         override fun after() {
-            runBlocking { context.authDataStore.edit { it.clear() } }
+            runBlocking { context.settingsDataStore.edit { it.clear() } }
         }
     }
 

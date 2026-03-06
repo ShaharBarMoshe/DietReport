@@ -13,10 +13,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.diet.dietreport.auth.AuthViewModelFactory
-import com.diet.dietreport.auth.data.AuthRepository
-import com.diet.dietreport.auth.data.User
-import com.diet.dietreport.auth.data.authDataStore
 import com.diet.dietreport.data.db.AppDatabase
 import com.diet.dietreport.data.db.LogSource
 import com.diet.dietreport.data.db.MealLog
@@ -64,13 +60,6 @@ class ErrorHandlingTest {
             .executeShellCommand("pm grant ${context.packageName} android.permission.CAMERA")
             .close()
 
-        // Pre-sign-in so tests start past the sign-in screen
-        runBlocking {
-            AuthRepository(context.authDataStore).saveUser(
-                User("uid-error-test", "error@example.com", "Error Test User")
-            )
-        }
-
         // Create a minimal test image
         testImageFile = File(context.filesDir, "meals/test_error_meal.jpg")
             .also { it.parentFile?.mkdirs() }
@@ -96,13 +85,11 @@ class ErrorHandlingTest {
     fun tearDown() {
         scenario?.close()
         scenario = null
-        AuthViewModelFactory.testFactory = null
         SettingsViewModelFactory.testFactory = null
         LogMealViewModelFactory.testFactory = null
         SchedulerErrorBus.clear()
         runBlocking {
             db.reminderSlotDao().deleteFrom(0L)
-            context.authDataStore.edit { it.clear() }
             context.settingsDataStore.edit { it.clear() }
         }
         testImageFile.delete()
