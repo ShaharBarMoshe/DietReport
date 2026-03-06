@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.diet.dietreport.AppError
 import com.diet.dietreport.data.db.ReminderSlot
@@ -105,6 +106,60 @@ fun HomeScreen(
             }
         }
 
+        // Next meal banner
+        val now = uiState.nowMs
+        val nextPending = uiState.slots.firstOrNull { it.status == SlotStatus.PENDING }
+        if (nextPending != null) {
+            val isInWindow = now >= nextPending.scheduledAt - HomeViewModel.LOG_WINDOW_BEFORE_MS &&
+                now <= nextPending.scheduledAt + HomeViewModel.LOG_WINDOW_AFTER_MS
+            val (bannerText, isUrgent) = if (isInWindow) {
+                "Log your meal now!" to true
+            } else {
+                "Next meal at ${timeFormat.format(Date(nextPending.scheduledAt))}" to false
+            }
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isUrgent)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.secondaryContainer,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .semantics { testTag = "next_meal_banner" },
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Schedule,
+                        contentDescription = null,
+                        tint = if (isUrgent)
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Text(
+                        text = bannerText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (isUrgent) FontWeight.SemiBold else FontWeight.Normal,
+                        color = if (isUrgent)
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.semantics { testTag = "next_meal_banner_text" },
+                    )
+                }
+            }
+        }
+
         if (uiState.slots.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -135,7 +190,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(uiState.slots, key = { it.id }) { slot ->
-                    SlotCard(slot = slot, onNavigateToLogMeal = onNavigateToLogMeal)
+                    SlotCard(slot = slot, now = now, onNavigateToLogMeal = onNavigateToLogMeal)
                 }
             }
         }
@@ -143,12 +198,15 @@ fun HomeScreen(
 }
 
 @Composable
-private fun SlotCard(slot: ReminderSlot, onNavigateToLogMeal: (Long) -> Unit) {
+private fun SlotCard(slot: ReminderSlot, now: Long, onNavigateToLogMeal: (Long) -> Unit) {
     val isPending = slot.status == SlotStatus.PENDING
+    val isInWindow = now >= slot.scheduledAt - HomeViewModel.LOG_WINDOW_BEFORE_MS &&
+        now <= slot.scheduledAt + HomeViewModel.LOG_WINDOW_AFTER_MS
+    val isClickable = isPending && isInWindow
 
     Card(
-        onClick = { if (isPending) onNavigateToLogMeal(slot.id) },
-        enabled = isPending,
+        onClick = { if (isClickable) onNavigateToLogMeal(slot.id) },
+        enabled = isClickable,
         modifier = Modifier
             .fillMaxWidth()
             .semantics { testTag = "slot_row_${slot.id}" },
@@ -192,10 +250,11 @@ private fun SlotCard(slot: ReminderSlot, onNavigateToLogMeal: (Long) -> Unit) {
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    text = when (slot.status) {
-                        SlotStatus.SUCCESS -> "Logged"
-                        SlotStatus.FAILED -> "Missed"
-                        else -> "Tap to log meal"
+                    text = when {
+                        slot.status == SlotStatus.SUCCESS -> "Logged"
+                        slot.status == SlotStatus.FAILED -> "Missed"
+                        isInWindow -> "Tap to log meal"
+                        else -> "Opens at ${timeFormat.format(Date(slot.scheduledAt - HomeViewModel.LOG_WINDOW_BEFORE_MS))}"
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

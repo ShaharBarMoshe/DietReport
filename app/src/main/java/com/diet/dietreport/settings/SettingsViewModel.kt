@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diet.dietreport.AppError
+import com.diet.dietreport.reminders.ReminderScheduler
 import com.diet.dietreport.settings.data.Settings
 import com.diet.dietreport.settings.data.SettingsRepository
+import java.util.Calendar
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -36,7 +38,10 @@ sealed class SettingsNavEvent {
     data object ToHome : SettingsNavEvent()
 }
 
-class SettingsViewModel(private val repository: SettingsRepository) : ViewModel() {
+class SettingsViewModel(
+    private val repository: SettingsRepository,
+    private val scheduler: ReminderScheduler? = null,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -128,6 +133,17 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
             _uiState.update { it.copy(isSaving = true, error = null) }
             try {
                 repository.save(result.getOrThrow())
+
+                // Schedule (or reschedule) today's meal reminders from now
+                scheduler?.let { s ->
+                    val now = System.currentTimeMillis()
+                    val cal = Calendar.getInstance()
+                    val wakeMs = todayTimeMs(settings.wakeHour, settings.wakeMinute, cal)
+                    val bedtimeMs = todayTimeMs(settings.bedHour, settings.bedMinute, cal)
+                    val delayMs = settings.firstMealDelayMinutes * 60_000L
+                    s.scheduleForDay(wakeMs, delayMs, bedtimeMs, fromMs = now)
+                }
+
                 if (wasOnboarding) {
                     repository.markOnboardingComplete()
                     _navEvent.emit(SettingsNavEvent.ToHome)
@@ -153,6 +169,14 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    private fun todayTimeMs(hour: Int, minute: Int, cal: Calendar): Long {
+        cal.set(Calendar.HOUR_OF_DAY, hour)
+        cal.set(Calendar.MINUTE, minute)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        return cal.timeInMillis
     }
 
     private fun parseTime(text: String): Pair<Int, Int>? {

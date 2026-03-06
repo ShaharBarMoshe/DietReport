@@ -25,4 +25,7 @@ interface ReminderSlotDao {
 
     @Query("DELETE FROM reminder_slots WHERE scheduledAt >= :fromMs")
     suspend fun deleteFrom(fromMs: Long)
+
+    @Query("UPDATE reminder_slots SET status = 'FAILED' WHERE status = 'PENDING' AND scheduledAt < :cutoffMs")
+    suspend fun markExpiredAsFailed(cutoffMs: Long)
 }
