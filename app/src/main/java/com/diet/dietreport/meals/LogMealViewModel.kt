@@ -22,6 +22,7 @@ data class LogMealUiState(
     val photoPath: String? = null,
     val photoSource: String? = null,
     val isConfirmed: Boolean = false,
+    val isOffSchedule: Boolean = false,
     val error: AppError? = null,
 )
 
@@ -57,6 +58,8 @@ class LogMealViewModel(
         _uiState.update { it.copy(error = null) }
     }
 
+    val isOffSchedule: Boolean get() = slotId == 0L
+
     fun confirm() {
         val state = _uiState.value
         val photoPath = state.photoPath ?: return
@@ -66,20 +69,24 @@ class LogMealViewModel(
                 val now = System.currentTimeMillis()
                 mealLogDao.insert(
                     MealLog(
-                        reminderSlotId = slotId,
+                        reminderSlotId = if (isOffSchedule) null else slotId,
                         photoPath = photoPath,
                         loggedAt = now,
                         source = state.photoSource ?: LogSource.CAMERA,
                     )
                 )
-                val slot = slotDao.getById(slotId)
-                if (slot != null) {
-                    val isOnTime = now <= slot.scheduledAt + SUCCESS_WINDOW_MS
-                    val status = if (isOnTime) SlotStatus.SUCCESS else SlotStatus.FAILED
-                    slotDao.updateStatus(slotId, status)
-                    Log.d(TAG, "Meal logged: slotId=$slotId source=${state.photoSource} onTime=$isOnTime")
+                if (!isOffSchedule) {
+                    val slot = slotDao.getById(slotId)
+                    if (slot != null) {
+                        val isOnTime = now <= slot.scheduledAt + SUCCESS_WINDOW_MS
+                        val status = if (isOnTime) SlotStatus.SUCCESS else SlotStatus.FAILED
+                        slotDao.updateStatus(slotId, status)
+                        Log.d(TAG, "Meal logged: slotId=$slotId source=${state.photoSource} onTime=$isOnTime")
+                    }
+                } else {
+                    Log.d(TAG, "Off-schedule meal logged: source=${state.photoSource}")
                 }
-                _uiState.update { it.copy(isConfirmed = true) }
+                _uiState.update { it.copy(isConfirmed = true, isOffSchedule = isOffSchedule) }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to log meal for slot $slotId", e)
                 _uiState.update {

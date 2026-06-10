@@ -62,12 +62,15 @@ private const val TAG = "DR/Meals"
 fun LogMealScreen(
     viewModel: LogMealViewModel,
     onNavigateToLock: (slotId: Long) -> Unit,
+    onNavigateToHome: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(uiState.isConfirmed) {
-        if (uiState.isConfirmed) onNavigateToLock(viewModel.slotId)
+        if (uiState.isConfirmed) {
+            if (uiState.isOffSchedule) onNavigateToHome() else onNavigateToLock(viewModel.slotId)
+        }
     }
 
     val controller = remember {

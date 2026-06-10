@@ -6,8 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.diet.dietreport.data.db.AppDatabase
 
 class ReportViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    private val repo = ReportRepository { start, end ->
-        AppDatabase.getInstance(context).reminderSlotDao().slotsForRange(start, end)
+    private val db = AppDatabase.getInstance(context)
+    private val repo = object : ReportRepository {
+        override suspend fun slotsForRange(startMs: Long, endMs: Long) =
+            db.reminderSlotDao().slotsForRange(startMs, endMs)
+        override suspend fun offScheduleLogsForRange(startMs: Long, endMs: Long) =
+            db.mealLogDao().offScheduleLogsForRange(startMs, endMs)
+        override suspend fun clearLastWeek(startMs: Long, endMs: Long) {
+            db.mealLogDao().deleteForSlotRange(startMs, endMs)
+            db.reminderSlotDao().resetStatusForRange(startMs, endMs)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

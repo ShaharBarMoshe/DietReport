@@ -41,6 +41,11 @@
             android:exported="false" />
 
         <receiver
+            android:name=".reminders.DailyRescheduleReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
             android:name=".reminders.BootReceiver"
             android:enabled="true"
             android:exported="true">

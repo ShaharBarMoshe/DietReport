@@ -25,6 +25,7 @@ data class ReportData(
     val byDay: List<DayStat>,
     val byHour: List<HourStat>,
     val buckets: List<BucketStat>,  // Morning, Afternoon, Evening
+    val offScheduleCount: Int = 0,
 ) {
     val overallPercent: Int get() = if (overallTotal == 0) 0 else overallSuccess * 100 / overallTotal
 }
@@ -102,4 +103,8 @@ fun buildShareText(period: ReportPeriod, data: ReportData): String = buildString
     appendLine()
     val (m, a, e) = data.buckets
     append("Morning: ${m.percent}% | Afternoon: ${a.percent}% | Evening: ${e.percent}%")
+    if (data.offScheduleCount > 0) {
+        appendLine()
+        append("Unscheduled meals: ${data.offScheduleCount} (not counted toward goal)")
+    }
 }

@@ -24,7 +24,7 @@ object LogSource {
 )
 data class MealLog(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val reminderSlotId: Long,
+    val reminderSlotId: Long?,
     val photoPath: String,
     val loggedAt: Long,
     val source: String,

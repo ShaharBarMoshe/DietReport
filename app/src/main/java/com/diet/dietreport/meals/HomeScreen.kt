@@ -18,8 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -49,6 +51,7 @@ private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToLogMeal: (slotId: Long) -> Unit,
+    onLogExtraMeal: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -104,6 +107,24 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+
+        // Log Extra Meal button
+        Button(
+            onClick = onLogExtraMeal,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .height(48.dp)
+                .semantics { testTag = "log_extra_meal_button" },
+            shape = RoundedCornerShape(12.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+            )
+            Text("Log Unscheduled Meal", modifier = Modifier.padding(start = 8.dp))
         }
 
         // Next meal banner

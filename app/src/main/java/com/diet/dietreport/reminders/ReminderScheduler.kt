@@ -16,11 +16,14 @@ class ReminderScheduler(
 ) {
     private companion object {
         private const val TAG = "DR/Reminder"
+        /** Fixed request code for the daily-reschedule alarm (avoids collision with slot IDs). */
+        private const val NEXT_DAY_REQUEST_CODE = Int.MAX_VALUE - 1
     }
 
     /**
      * Computes slots for a day, clears any future slots from [fromMs] onwards, inserts new
-     * slots into the database, and schedules an AlarmManager alarm for each.
+     * slots into the database, schedules an AlarmManager alarm for each, and sets a
+     * next-day alarm so reminders automatically repeat every day.
      */
     suspend fun scheduleForDay(
         wakeMs: Long,
@@ -48,12 +51,36 @@ class ReminderScheduler(
                 scheduleAlarm(slotId, slotTime.scheduledAt)
                 Log.d(TAG, "Slot $slotId scheduled at ${slotTime.scheduledAt}")
             }
+
+            scheduleNextDayAlarm(wakeMs)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to schedule reminders", e)
             SchedulerErrorBus.post(
                 AppError.SchedulerError("Failed to schedule reminders: ${e.message}", e)
             )
         }
+    }
+
+    /**
+     * Schedules an alarm for tomorrow's wake time that fires [DailyRescheduleReceiver],
+     * which in turn calls [scheduleForDay] for the new day, creating a self-perpetuating chain.
+     */
+    private fun scheduleNextDayAlarm(todayWakeMs: Long) {
+        val tomorrowWakeMs = todayWakeMs + 24L * 60 * 60 * 1000
+        val alarmManager = context.getSystemService(AlarmManager::class.java)
+        val intent = Intent(context, DailyRescheduleReceiver::class.java)
+        val pi = PendingIntent.getBroadcast(
+            context,
+            NEXT_DAY_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        if (alarmManager.canScheduleExactAlarms()) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, tomorrowWakeMs, pi)
+        } else {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, tomorrowWakeMs, pi)
+        }
+        Log.d(TAG, "Next-day reschedule alarm set for $tomorrowWakeMs")
     }
 
     private fun scheduleAlarm(slotId: Long, scheduledAt: Long) {

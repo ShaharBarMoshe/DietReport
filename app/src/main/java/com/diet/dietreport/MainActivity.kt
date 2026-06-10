@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -41,6 +42,9 @@ import com.diet.dietreport.meals.HomeScreen
 import com.diet.dietreport.meals.HomeViewModelFactory
 import com.diet.dietreport.meals.LogMealScreen
 import com.diet.dietreport.meals.LogMealViewModelFactory
+import com.diet.dietreport.meals.PhotoGalleryScreen
+import com.diet.dietreport.meals.PhotoGalleryViewModel
+import com.diet.dietreport.meals.PhotoGalleryViewModelFactory
 import com.diet.dietreport.reports.ReportScreen
 import com.diet.dietreport.reports.ReportViewModelFactory
 import com.diet.dietreport.settings.SettingsScreen
@@ -49,6 +53,7 @@ import com.diet.dietreport.settings.SettingsViewModelFactory
 import com.diet.dietreport.settings.data.SettingsRepository
 import com.diet.dietreport.settings.data.settingsDataStore
 import kotlinx.coroutines.flow.first
+import com.diet.dietreport.reminders.NotificationHelper
 import com.diet.dietreport.ui.theme.DietReportTheme
 
 object Routes {
@@ -57,6 +62,7 @@ object Routes {
     const val LOG_MEAL = "log_meal/{slotId}"
     const val REPORT = "report"
     const val LOCK = "lock/{slotId}"
+    const val GALLERY = "gallery"
 
     fun logMeal(slotId: Long) = "log_meal/$slotId"
     fun lock(slotId: Long) = "lock/$slotId"
@@ -71,6 +77,7 @@ private data class NavItem(
 
 private val bottomNavItems = listOf(
     NavItem(Routes.HOME, "Home", Icons.Default.Home, "Home"),
+    NavItem(Routes.GALLERY, "Photos", Icons.Default.PhotoLibrary, "Photos"),
     NavItem(Routes.SETTINGS, "Settings", Icons.Default.Settings, "Settings"),
     NavItem(Routes.REPORT, "Report", Icons.Default.DateRange, "Report"),
 )
@@ -87,6 +94,10 @@ class MainActivity : ComponentActivity() {
 
     private val reportViewModel: com.diet.dietreport.reports.ReportViewModel by viewModels {
         ReportViewModelFactory(application)
+    }
+
+    private val galleryViewModel: PhotoGalleryViewModel by viewModels {
+        PhotoGalleryViewModelFactory(application)
     }
 
     override fun onResume() {
@@ -108,6 +119,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NotificationHelper.createChannel(this)
         enableEdgeToEdge()
         setContent {
             DietReportTheme {
@@ -189,6 +201,9 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToLogMeal = { slotId ->
                                     navController.navigate(Routes.logMeal(slotId))
                                 },
+                                onLogExtraMeal = {
+                                    navController.navigate(Routes.logMeal(0L))
+                                },
                             )
                         }
                         composable(Routes.SETTINGS) { SettingsScreen(settingsViewModel) }
@@ -205,6 +220,11 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToLock = { confirmedSlotId ->
                                     navController.navigate(Routes.lock(confirmedSlotId)) {
                                         popUpTo(Routes.LOG_MEAL) { inclusive = true }
+                                    }
+                                },
+                                onNavigateToHome = {
+                                    navController.navigate(Routes.HOME) {
+                                        popUpTo(0) { inclusive = true }
                                     }
                                 },
                             )
@@ -226,6 +246,7 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
                         }
+                        composable(Routes.GALLERY) { PhotoGalleryScreen(galleryViewModel) }
                         composable(Routes.REPORT) { ReportScreen(reportViewModel) }
                     }
                 }

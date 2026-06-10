@@ -31,6 +31,7 @@ object NotificationHelper {
     }
 
     fun showReminderNotification(context: Context, slotId: Long, scheduledAt: Long) {
+        createChannel(context)
         val timeStr = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(scheduledAt))
 
         // "Log meal" action → opens MainActivity (deep link wired in Phase 6)

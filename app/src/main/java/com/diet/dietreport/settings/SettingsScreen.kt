@@ -86,7 +86,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics { testTag = "wake_time_field" },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                 )
 
@@ -99,7 +99,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics { testTag = "bed_time_field" },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                 )
 

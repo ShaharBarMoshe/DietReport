@@ -58,7 +58,7 @@ class HomeViewModel(private val slotDao: ReminderSlotDao) : ViewModel() {
                 slot.status == SlotStatus.SUCCESS || now <= slot.scheduledAt + HIDE_AFTER_MS
             }
             HomeUiState(slots = visible, error = schedulerError, nowMs = now)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeUiState())
 
         // Auto-mark PENDING slots past the log window as FAILED
         viewModelScope.launch {
