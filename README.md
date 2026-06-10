@@ -25,9 +25,9 @@ Fully offline. No backend. No cloud sync. Your salad photos stay between you and
 
 | Document | Description |
 |---|---|
-| [User Guide](docs/user-guide.html) | Every screen explained — Home, logging, lock screen, gallery, settings, reports |
+| [User Guide](https://shaharbarmoshe.github.io/DietReport/user-guide.html) | Every screen explained — Home, logging, lock screen, gallery, settings, reports |
 | [Installation Guide](docs/install.md) | Build from source and sideload via USB |
-| [Architecture](docs/architecture.html) | Package structure, data layer, scheduling, error handling |
+| [Architecture](https://shaharbarmoshe.github.io/DietReport/architecture.html) | Package structure, data layer, scheduling, error handling |
 
 ---
 
@@ -75,7 +75,7 @@ com.diet.dietreport/
 └── ui/theme/     — Material 3 theme
 ```
 
-See [Architecture](docs/architecture.html) for the full breakdown.
+See [Architecture](https://shaharbarmoshe.github.io/DietReport/architecture.html) for the full breakdown.
 
 ---
 
