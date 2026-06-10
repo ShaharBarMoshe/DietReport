@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DietReport — Architecture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ── Terminal Green palette ── */
+        :root {
+            --bg:         #0d1117;
+            --surface:    #161b22;
+            --surface-2:  #1c2128;
+            --border:     #30363d;
+            --border-dim: #21262d;
+            --text:       #e6edf3;
+            --text-mid:   #8b949e;
+            --text-dim:   #6e7681;
+            --green:      #3fb950;
+            --green-dim:  rgba(63,185,80,0.12);
+            --green-glow: rgba(63,185,80,0.35);
+            --blue:       #58a6ff;
+            --blue-dim:   rgba(88,166,255,0.10);
+            --orange:     #e3b341;
+            --orange-dim: rgba(227,179,65,0.10);
+            --purple:     #bc8cff;
+            --purple-dim: rgba(188,140,255,0.10);
+            --red:        #ff7b72;
+            --red-dim:    rgba(255,123,114,0.10);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+        }
+
+        /* ── HEADER ── */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* blinking cursor — Terminal Green signature */
+        .header-prompt {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--green);
+        }
+
+        .header-prompt::after {
+            content: '▌';
+            animation: blink 1.1s step-end infinite;
+        }
+
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .app-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .doc-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 3px 9px;
+            border-radius: 4px;
+            background: var(--green-dim);
+            border: 1px solid var(--green-glow);
+            color: var(--green);
+            letter-spacing: 0.04em;
+        }
+
+        .header-nav {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-nav a {
+            color: var(--text-mid);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.15s;
+        }
+        .header-nav a:hover { color: var(--text); }
+
+        /* ── SECTION TABS ── */
+        .section-tabs {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .section-tabs::-webkit-scrollbar { display: none; }
+
+        .section-tabs a {
+            display: block;
+            padding: 12px 14px;
+            color: var(--text-mid);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .section-tabs a:hover {
+            color: var(--text);
+            border-bottom-color: var(--border);
+        }
+
+        /* ── MAIN ── */
+        .main {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 56px 40px 100px;
+        }
+
+        /* ── PAGE INTRO ── */
+        .page-intro {
+            margin-bottom: 64px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-intro h1 {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 10px;
+        }
+
+        .page-intro h1 span { color: var(--green); }
+
+        .page-intro p {
+            color: var(--text-mid);
+            font-size: 1rem;
+            max-width: 540px;
+        }
+
+        /* ── SECTIONS ── */
+        section {
+            margin-bottom: 72px;
+            scroll-margin-top: 100px;
+        }
+
+        section h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h2 .hash { color: var(--green); font-weight: 400; }
+
+        section h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin: 28px 0 12px;
+        }
+
+        p { color: var(--text-mid); margin-bottom: 14px; }
+        p strong { color: var(--text); font-weight: 600; }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82em;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--orange);
+        }
+
+        /* ── TABLES ── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 18px 0;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+        thead th {
+            background: var(--surface);
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-dim);
+            color: var(--text-mid);
+            vertical-align: top;
+        }
+
+        tbody td strong { color: var(--text); }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* ── STACK DIAGRAM ── */
+        .stack-diagram {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 24px 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stack-layer {
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+        .stack-layer:last-child { border-bottom: none; }
+
+        .layer-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .layer-items {
+            font-size: 0.8rem;
+            color: var(--text-mid);
+        }
+
+        .layer-ui      { background: var(--blue-dim);   }
+        .layer-ui      .layer-label { color: var(--blue); }
+
+        .layer-domain  { background: var(--green-dim);  }
+        .layer-domain  .layer-label { color: var(--green); }
+
+        .layer-db-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .layer-room {
+            padding: 16px 22px;
+            background: var(--purple-dim);
+            border-right: 1px solid var(--border);
+        }
+        .layer-room .layer-label { color: var(--purple); }
+
+        .layer-ds {
+            padding: 16px 22px;
+            background: var(--orange-dim);
+        }
+        .layer-ds .layer-label { color: var(--orange); }
+
+        .layer-platform { background: var(--red-dim);   }
+        .layer-platform .layer-label { color: var(--red); }
+
+        /* ── NAV FLOW ── */
+        .nav-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin: 16px 0;
+            padding: 18px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+        }
+
+        .flow-node {
+            padding: 5px 12px;
+            border-radius: 5px;
+            border: 1px solid;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .fn-home     { background: var(--blue-dim);   border-color: rgba(88,166,255,0.35);  color: var(--blue); }
+        .fn-log      { background: var(--green-dim);  border-color: var(--green-glow);       color: var(--green); }
+        .fn-lock     { background: var(--red-dim);    border-color: rgba(255,123,114,0.35); color: var(--red); }
+        .fn-settings { background: var(--orange-dim); border-color: rgba(227,179,65,0.35);  color: var(--orange); }
+
+        .flow-arrow { color: var(--text-dim); }
+        .flow-note  { color: var(--text-dim); font-style: italic; font-size: 0.72rem; }
+
+        /* ── FILE TREE ── */
+        .file-tree {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 22px 26px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 2;
+            overflow-x: auto;
+        }
+
+        .ft-root    { color: var(--text);     font-weight: 700; }
+        .ft-dir     { color: var(--blue);     font-weight: 500; }
+        .ft-file    { color: var(--text-mid); }
+        .ft-comment { color: var(--text-dim); font-style: italic; }
+
+        /* ── SCHEMA GRID ── */
+        .schema-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 18px 0;
+        }
+
+        .schema-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .schema-header {
+            background: var(--surface-2);
+            padding: 9px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--purple);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .schema-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            gap: 12px;
+        }
+        .schema-row:last-child { border-bottom: none; }
+
+        .sr-name { color: var(--text); min-width: 110px; }
+        .sr-type { color: var(--orange); font-size: 0.72rem; }
+        .sr-note { color: var(--text-dim); font-size: 0.7rem; font-style: italic; }
+
+        /* ── SCHEDULING STEPS ── */
+        .sched-steps { margin: 16px 0; }
+
+        .sched-step {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+
+        /* connector line between steps */
+        .sched-step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 32px;
+            bottom: -12px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .sched-step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--green-glow);
+            color: var(--green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-bottom: 24px;
+        }
+
+        .sched-step-body { flex: 1; padding-bottom: 4px; }
+
+        .sched-step-body strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .sched-step-body span {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+        }
+
+        /* ── CALLOUTS ── */
+        .callout {
+            display: flex;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 0.88rem;
+        }
+
+        .callout p { margin: 0; font-size: 0.88rem; }
+        .callout-icon { font-size: 0.95rem; flex-shrink: 0; margin-top: 2px; }
+
+        .callout-green {
+            background: var(--green-dim);
+            border: 1px solid var(--green-glow);
+            color: var(--green);
+        }
+
+        .callout-blue {
+            background: var(--blue-dim);
+            border: 1px solid rgba(88,166,255,0.3);
+            color: var(--blue);
+        }
+
+        .callout-note {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-mid);
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 24px 40px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: color 0.15s;
+        }
+        .footer-links a:hover { color: var(--text); }
+        .site-footer p { font-size: 0.8rem; color: var(--text-dim); }
+
+        /* ── REDUCED MOTION ── */
+        @media (prefers-reduced-motion: reduce) {
+            .header-prompt::after { animation: none; }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 640px) {
+            .main { padding: 32px 20px 60px; }
+            .schema-grid { grid-template-columns: 1fr; }
+            .layer-db-row { grid-template-columns: 1fr; }
+            .layer-room { border-right: none; border-bottom: 1px solid var(--border); }
+            .nav-flow { flex-direction: column; align-items: flex-start; }
+            .site-header, .section-tabs { padding-left: 20px; padding-right: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────── -->
+<header class="site-header">
+    <span class="header-prompt">~/DietReport $&nbsp;</span>
+    <span class="app-name">DietReport</span>
+    <span class="doc-badge">ARCHITECTURE</span>
+    <nav class="header-nav">
+        <a href="../README.md">← README</a>
+        <a href="user-guide.html">User Guide</a>
+        <a href="install.md">Install</a>
+    </nav>
+</header>
+
+<!-- ── SECTION TABS ───────────────────────────────────── -->
+<nav class="section-tabs">
+    <a href="#overview">overview</a>
+    <a href="#tech-stack">tech_stack</a>
+    <a href="#packages">packages</a>
+    <a href="#navigation">navigation</a>
+    <a href="#data-layer">data_layer</a>
+    <a href="#scheduling">scheduling</a>
+    <a href="#errors">errors</a>
+    <a href="#testing">testing</a>
+</nav>
+
+<!-- ── MAIN ───────────────────────────────────────────── -->
+<main class="main">
+
+    <div class="page-intro">
+        <h1>Architecture <span>//</span> DietReport</h1>
+        <p>Technical reference: package structure, data layer, reminder scheduling, error handling, and testing conventions.</p>
+    </div>
+
+    <!-- ── OVERVIEW ──────────────────────────────────── -->
+    <section id="overview">
+        <h2><span class="hash">#</span> overview</h2>
+        <p>DietReport is a <strong>fully offline</strong> Android app. No backend, no network calls, no user accounts. All data — meal logs, photos, settings — lives on the device.</p>
+
+        <div class="stack-diagram">
+            <div class="stack-layer layer-ui">
+                <div class="layer-label">UI Layer</div>
+                <div class="layer-items">Jetpack Compose screens · ViewModels · Navigation Compose</div>
+            </div>
+            <div class="stack-layer layer-domain">
+                <div class="layer-label">Domain / Logic</div>
+                <div class="layer-items">SlotComputer · SettingsValidator · ReportMetrics · ReminderScheduler</div>
+            </div>
+            <div class="layer-db-row">
+                <div class="layer-room">
+                    <div class="layer-label">Room DB</div>
+                    <div class="layer-items">MealLog · ReminderSlot entities + DAOs</div>
+                </div>
+                <div class="layer-ds">
+                    <div class="layer-label">DataStore</div>
+                    <div class="layer-items">SettingsRepository (preferences)</div>
+                </div>
+            </div>
+            <div class="stack-layer layer-platform">
+                <div class="layer-label">Android Platform Services</div>
+                <div class="layer-items">AlarmManager · CameraX · NotificationManager · BroadcastReceivers</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── TECH STACK ─────────────────────────────────── -->
+    <section id="tech-stack">
+        <h2><span class="hash">#</span> tech_stack</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Area</th><th>Technology</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>Language</td><td><strong>Kotlin 2.0.21</strong></td><td>—</td></tr>
+                    <tr><td>UI</td><td><strong>Jetpack Compose + Material Design 3</strong></td><td>Compose BOM 2024.09.00</td></tr>
+                    <tr><td>Architecture</td><td><strong>MVVM</strong>, single Activity</td><td>—</td></tr>
+                    <tr><td>Navigation</td><td><strong>Navigation Compose</strong></td><td>2.7.7</td></tr>
+                    <tr><td>Database</td><td><strong>Room</strong></td><td>—</td></tr>
+                    <tr><td>Preferences</td><td><strong>DataStore Preferences</strong></td><td>application-scoped delegate</td></tr>
+                    <tr><td>Scheduling</td><td><strong>AlarmManager</strong> exact alarms</td><td><code>setExactAndAllowWhileIdle()</code></td></tr>
+                    <tr><td>Camera</td><td><strong>CameraX</strong></td><td>—</td></tr>
+                    <tr><td>Min SDK</td><td>API 35 (Android 15)</td><td>No <code>Build.VERSION</code> guards needed</td></tr>
+                    <tr><td>Target SDK</td><td>API 36 (Android 16)</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-blue">
+            <span class="callout-icon">ℹ</span>
+            <p>The Kotlin Compose compiler plugin is <strong>bundled with Kotlin 2.0+</strong>. Do not add a separate <code>kotlinCompilerExtensionVersion</code> — it will conflict.</p>
+        </div>
+    </section>
+
+    <!-- ── PACKAGES ───────────────────────────────────── -->
+    <section id="packages">
+        <h2><span class="hash">#</span> packages</h2>
+
+        <div class="file-tree">
+<span class="ft-root">com.diet.dietreport/</span>
+├── <span class="ft-file">MainActivity.kt</span>             <span class="ft-comment">single Activity, NavHost, bottom nav</span>
+├── <span class="ft-file">AppError.kt</span>                 <span class="ft-comment">sealed class for all app-level errors</span>
+├── <span class="ft-file">SchedulerErrorBus.kt</span>        <span class="ft-comment">app-scoped SharedFlow for permission errors</span>
+│
+├── <span class="ft-dir">ui/theme/</span>                    <span class="ft-comment">Material 3 theme (Color, Type, Theme)</span>
+│
+├── <span class="ft-dir">data/db/</span>
+│   ├── <span class="ft-file">AppDatabase.kt</span>          <span class="ft-comment">Room database, v2+</span>
+│   ├── <span class="ft-file">MealLog.kt</span>              <span class="ft-comment">entity: one log per reminder slot</span>
+│   ├── <span class="ft-file">MealLogDao.kt</span>
+│   ├── <span class="ft-file">ReminderSlot.kt</span>         <span class="ft-comment">entity: scheduled alarm record</span>
+│   └── <span class="ft-file">ReminderSlotDao.kt</span>
+│
+├── <span class="ft-dir">settings/</span>
+│   ├── <span class="ft-dir">data/</span>
+│   │   ├── <span class="ft-file">SettingsRepository.kt</span>    <span class="ft-comment">DataStore read/write wrapper</span>
+│   │   └── <span class="ft-file">settingsDataStore.kt</span>
+│   ├── <span class="ft-file">SettingsScreen.kt</span>
+│   ├── <span class="ft-file">SettingsViewModel.kt</span>
+│   └── <span class="ft-file">SettingsValidator.kt</span>     <span class="ft-comment">pure validation — no Android deps</span>
+│
+├── <span class="ft-dir">reminders/</span>
+│   ├── <span class="ft-file">SlotComputer.kt</span>          <span class="ft-comment">pure: compute reminder times from schedule</span>
+│   ├── <span class="ft-file">ReminderScheduler.kt</span>     <span class="ft-comment">schedules AlarmManager exact alarms</span>
+│   ├── <span class="ft-file">NotificationHelper.kt</span>    <span class="ft-comment">channel creation + notification builder</span>
+│   ├── <span class="ft-file">ReminderReceiver.kt</span>      <span class="ft-comment">fired by AlarmManager, shows notification</span>
+│   ├── <span class="ft-file">SnoozeReceiver.kt</span>        <span class="ft-comment">"Snooze" notification action</span>
+│   ├── <span class="ft-file">BootReceiver.kt</span>          <span class="ft-comment">restores alarms after device reboot</span>
+│   ├── <span class="ft-file">DailyRescheduleReceiver.kt</span>  <span class="ft-comment">midnight: build next day's slots</span>
+│   └── <span class="ft-file">TimezoneChangeReceiver.kt</span>   <span class="ft-comment">rebuild schedule on timezone change</span>
+│
+├── <span class="ft-dir">meals/</span>
+│   ├── <span class="ft-file">HomeScreen.kt</span>
+│   ├── <span class="ft-file">LogMealScreen.kt</span>         <span class="ft-comment">CameraX preview + system gallery picker</span>
+│   ├── <span class="ft-file">PhotoGalleryScreen.kt</span>    <span class="ft-comment">grid of all logged meal photos</span>
+│   └── <span class="ft-comment">... ViewModels + Factories</span>
+│
+├── <span class="ft-dir">lock/</span>
+│   └── <span class="ft-file">LockScreen.kt</span>            <span class="ft-comment">fullscreen 10-min countdown</span>
+│
+└── <span class="ft-dir">reports/</span>
+    ├── <span class="ft-file">ReportScreen.kt</span>
+    └── <span class="ft-file">ReportMetrics.kt</span>         <span class="ft-comment">pure: compute stats from MealLog list</span>
+        </div>
+    </section>
+
+    <!-- ── NAVIGATION ─────────────────────────────────── -->
+    <section id="navigation">
+        <h2><span class="hash">#</span> navigation</h2>
+        <p>Single <code>NavHost</code> in <code>MainActivity</code>. Routes are string constants in the <code>Routes</code> object. All screens are Compose destinations.</p>
+
+        <h3>Primary flow</h3>
+        <div class="nav-flow">
+            <span class="flow-node fn-home">HOME</span>
+            <span class="flow-arrow"> ──tap slot──→ </span>
+            <span class="flow-node fn-log">LOG_MEAL/{slotId}</span>
+            <span class="flow-arrow"> ──confirm──→ </span>
+            <span class="flow-node fn-lock">LOCK/{slotId}</span>
+            <span class="flow-arrow"> ──done──→ </span>
+            <span class="flow-node fn-home">HOME</span>
+        </div>
+
+        <h3>First-launch onboarding</h3>
+        <div class="nav-flow">
+            <span class="flow-note">isOnboardingComplete = false</span>
+            <span class="flow-arrow"> ──→ </span>
+            <span class="flow-node fn-settings">SETTINGS</span>
+            <span class="flow-arrow"> ──first save──→ </span>
+            <span class="flow-node fn-home">HOME</span>
+        </div>
+
+        <h3>Notification deep-link</h3>
+        <p>The "Log meal" notification action carries a <code>slot_id</code> extra. <code>MainActivity.onCreate()</code> reads it and navigates directly to <code>LOG_MEAL/{slotId}</code>, bypassing Home.</p>
+
+        <p>Bottom navigation tabs: <strong>HOME ↔ GALLERY ↔ SETTINGS ↔ REPORT</strong>. The bottom bar is hidden on the <code>LOCK</code> route.</p>
+    </section>
+
+    <!-- ── DATA LAYER ─────────────────────────────────── -->
+    <section id="data-layer">
+        <h2><span class="hash">#</span> data_layer</h2>
+
+        <h3>Room — entities</h3>
+        <div class="schema-grid">
+            <div class="schema-card">
+                <div class="schema-header">ReminderSlot</div>
+                <div class="schema-row"><span class="sr-name">id</span><span><span class="sr-type">Long</span> <span class="sr-note">PK, autoincrement</span></span></div>
+                <div class="schema-row"><span class="sr-name">scheduledAt</span><span><span class="sr-type">Long</span> <span class="sr-note">epoch millis</span></span></div>
+                <div class="schema-row"><span class="sr-name">date</span><span><span class="sr-type">String</span> <span class="sr-note">yyyy-MM-dd</span></span></div>
+            </div>
+            <div class="schema-card">
+                <div class="schema-header">MealLog</div>
+                <div class="schema-row"><span class="sr-name">id</span><span><span class="sr-type">Long</span> <span class="sr-note">PK, autoincrement</span></span></div>
+                <div class="schema-row"><span class="sr-name">slotId</span><span><span class="sr-type">Long</span> <span class="sr-note">FK → ReminderSlot (0 = extra)</span></span></div>
+                <div class="schema-row"><span class="sr-name">photoPath</span><span><span class="sr-type">String</span> <span class="sr-note">absolute path on device</span></span></div>
+                <div class="schema-row"><span class="sr-name">loggedAt</span><span><span class="sr-type">Long</span> <span class="sr-note">epoch millis</span></span></div>
+                <div class="schema-row"><span class="sr-name">success</span><span><span class="sr-type">Boolean</span> <span class="sr-note">within 30-min window</span></span></div>
+                <div class="schema-row"><span class="sr-name">date</span><span><span class="sr-type">String</span> <span class="sr-note">yyyy-MM-dd</span></span></div>
+            </div>
+        </div>
+
+        <h3>DataStore — preference keys</h3>
+        <p><code>SettingsRepository</code> exposes all user preferences as typed <code>Flow&lt;T&gt;</code> properties via a <code>settingsDataStore</code> application-scoped delegate.</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>wakeTimeMinutes</code></td><td>Flow&lt;Int&gt;</td><td>Minutes since midnight</td></tr>
+                    <tr><td><code>bedtimeMinutes</code></td><td>Flow&lt;Int&gt;</td><td>Minutes since midnight</td></tr>
+                    <tr><td><code>firstMealDelayMinutes</code></td><td>Flow&lt;Int&gt;</td><td>0–180</td></tr>
+                    <tr><td><code>ringtone</code></td><td>Flow&lt;String&gt;</td><td>"default" | "alarm" | "notification"</td></tr>
+                    <tr><td><code>activityMonitorEnabled</code></td><td>Flow&lt;Boolean&gt;</td><td>—</td></tr>
+                    <tr><td><code>isOnboardingComplete</code></td><td>Flow&lt;Boolean&gt;</td><td>Routes first launch to Settings</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ── SCHEDULING ─────────────────────────────────── -->
+    <section id="scheduling">
+        <h2><span class="hash">#</span> scheduling</h2>
+
+        <div class="callout callout-green">
+            <span class="callout-icon">⚡</span>
+            <p><code>SlotComputer.computeSlots()</code> is a <strong>pure function</strong>. It takes wake time, first-meal delay, and bedtime in epoch millis and returns a list of <code>SlotTime</code> objects — no Android dependencies, fully unit-testable.</p>
+        </div>
+
+        <p><code>ReminderScheduler</code> wraps <code>AlarmManager.setExactAndAllowWhileIdle()</code> and writes a <code>ReminderSlot</code> row to Room for each alarm so the Home screen can display upcoming slots without querying the AlarmManager.</p>
+
+        <h3>What triggers rescheduling</h3>
+        <div class="sched-steps">
+            <div class="sched-step">
+                <div class="sched-step-dot">1</div>
+                <div class="sched-step-body">
+                    <strong>SettingsViewModel</strong>
+                    <span>On first save and every subsequent save. Rebuilds today's slots immediately.</span>
+                </div>
+            </div>
+            <div class="sched-step">
+                <div class="sched-step-dot">2</div>
+                <div class="sched-step-body">
+                    <strong>BootReceiver</strong>
+                    <span>Fired on <code>ACTION_BOOT_COMPLETED</code>. Exact alarms don't survive reboots — this restores them.</span>
+                </div>
+            </div>
+            <div class="sched-step">
+                <div class="sched-step-dot">3</div>
+                <div class="sched-step-body">
+                    <strong>DailyRescheduleReceiver</strong>
+                    <span>A midnight alarm. Builds all slots for the next day in advance.</span>
+                </div>
+            </div>
+            <div class="sched-step">
+                <div class="sched-step-dot">4</div>
+                <div class="sched-step-body">
+                    <strong>TimezoneChangeReceiver</strong>
+                    <span>Fired on <code>ACTION_TIMEZONE_CHANGED</code>. Cancels and rebuilds all upcoming slots in the new local time.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── ERROR HANDLING ─────────────────────────────── -->
+    <section id="errors">
+        <h2><span class="hash">#</span> errors</h2>
+        <p>All app-level errors are modeled as sealed subclasses of <code>AppError</code>. The current subclass is <code>SchedulerError(message: String)</code> — extend it as needed; never swallow exceptions silently.</p>
+        <p><code>SchedulerErrorBus</code> is an application-scoped <code>SharedFlow</code>. <code>MainActivity.onResume()</code> checks exact-alarm and notification permission status on every resume and posts <code>SchedulerError</code> to the bus when either is revoked. The Home screen collects the bus and surfaces a warning banner.</p>
+
+        <div class="callout callout-note">
+            <span class="callout-icon">—</span>
+            <p>The bus pattern decouples the permission check (in Activity) from the UI response (in ViewModel/screen) without the two needing a direct reference to each other.</p>
+        </div>
+    </section>
+
+    <!-- ── TESTING ────────────────────────────────────── -->
+    <section id="testing">
+        <h2><span class="hash">#</span> testing</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Layer</th><th>Tool</th><th>Location</th></tr></thead>
+                <tbody>
+                    <tr><td>Unit tests</td><td>JUnit 4</td><td><code>app/src/test/</code></td></tr>
+                    <tr><td>Instrumented / E2E</td><td>Compose Test + UI Automator</td><td><code>app/src/androidTest/</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Pure logic classes (<code>SlotComputer</code>, <code>SettingsValidator</code>, <code>ReportMetrics</code>) are covered by unit tests — they have no Android dependencies so they run on the JVM.</p>
+        <p>Screen flows are covered by instrumented tests that launch <code>MainActivity</code> and drive the UI with UI Automator selectors via <code>testTagsAsResourceId = true</code>.</p>
+
+        <h3>Conventions</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Topic</th><th>Rule</th></tr></thead>
+                <tbody>
+                    <tr><td>Log tags</td><td><code>DR/&lt;Module&gt;</code> · <code>d</code> flow, <code>w</code> recoverable, <code>e</code> with throwable</td></tr>
+                    <tr><td>ProGuard</td><td><code>Log.d</code> stripped in release via <code>-assumenosideeffects</code></td></tr>
+                    <tr><td>SDK guards</td><td>None needed — minSdk 35 guarantees Android 15+</td></tr>
+                    <tr><td>Compose plugin</td><td>Bundled with Kotlin 2.0+ — no separate version entry</td></tr>
+                    <tr><td>Error handling</td><td>Map failures to <code>AppError</code> subclasses; surface via <code>uiState.error</code> or the error bus</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<!-- ── FOOTER ───────────────────────────────────────────── -->
+<footer class="site-footer">
+    <div class="footer-links">
+        <a href="../README.md">readme</a>
+        <a href="user-guide.html">user_guide</a>
+        <a href="install.md">install</a>
+        <a href="https://github.com/ShaharBarMoshe/DietReport">github</a>
+    </div>
+    <p>DietReport · Fully offline · No backend</p>
+</footer>
+
+</body>
+</html>

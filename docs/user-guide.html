@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DietReport — User Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ── Variables (Vintage Editorial palette) ── */
+        :root {
+            --cream:       #f5f3ee;
+            --cream-dark:  #ede9e1;
+            --cream-border:#d6d0c4;
+            --ink:         #1a1a1a;
+            --ink-mid:     #555;
+            --ink-light:   #888;
+            --accent:      #2b4f8a;
+            --accent-bg:   #edf2fb;
+            --accent-border:#b8cbe8;
+            --success:     #1a5c38;
+            --success-bg:  #e6f5ed;
+            --fail:        #7a1a1a;
+            --fail-bg:     #faeaea;
+            --pending-ink: #7a4a00;
+            --pending-bg:  #fef6e4;
+            --sidebar-w:   270px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 400;
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.75;
+        }
+
+        /* ── HEADER ── */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: var(--ink);
+            color: #fff;
+            padding: 0 36px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            font-family: 'Fraunces', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .header-sep { color: rgba(255,255,255,0.2); }
+
+        .header-doctype {
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .header-links {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-links a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.15s;
+        }
+        .header-links a:hover { color: #fff; }
+
+        /* ── LAYOUT ── */
+        .layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-w) 1fr;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            background: var(--cream-dark);
+            border-right: 1px solid var(--cream-border);
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            padding: 36px 0 40px;
+        }
+
+        .sidebar-label {
+            padding: 0 24px 14px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+        }
+
+        .sidebar-nav { list-style: none; }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 24px;
+            color: var(--ink-mid);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--ink);
+            background: rgba(0,0,0,0.04);
+        }
+
+        .sidebar-nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+            border-left-color: var(--accent);
+            background: var(--accent-bg);
+        }
+
+        .sidebar-num {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: var(--cream-border);
+            width: 18px;
+            text-align: right;
+            flex-shrink: 0;
+            transition: color 0.15s;
+        }
+
+        .sidebar-nav a.active .sidebar-num { color: var(--accent); }
+
+        /* ── CONTENT ── */
+        .content {
+            padding: 56px 60px 100px;
+            max-width: 860px;
+        }
+
+        /* page title */
+        .page-title {
+            margin-bottom: 52px;
+            padding-bottom: 36px;
+            border-bottom: 1px solid var(--cream-border);
+            position: relative;
+        }
+
+        /* geometric accent — circle outline + dot (Vintage Editorial signature) */
+        .page-title::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--cream-border);
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            top: 36px;
+            right: 26px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cream-border);
+        }
+
+        .page-title h1 {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .page-title p {
+            font-size: 1.05rem;
+            color: var(--ink-mid);
+            max-width: 520px;
+        }
+
+        /* sections */
+        section {
+            margin-bottom: 68px;
+            scroll-margin-top: 80px;
+        }
+
+        section h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--cream-border);
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .section-num {
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1rem;
+            color: var(--ink-light);
+        }
+
+        section h3 {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--ink);
+            margin: 28px 0 10px;
+        }
+
+        p { margin-bottom: 14px; color: var(--ink-mid); }
+        p strong { color: var(--ink); font-weight: 600; }
+
+        /* ── TABLES ── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 18px 0;
+            border-radius: 6px;
+            border: 1px solid var(--cream-border);
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+        thead th {
+            background: var(--cream-dark);
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            border-bottom: 1px solid var(--cream-border);
+        }
+
+        tbody td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--cream-border);
+            color: var(--ink-mid);
+            vertical-align: top;
+        }
+
+        tbody td strong { color: var(--ink); }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(0,0,0,0.02); }
+
+        /* ── STATUS CHIPS ── */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .chip-pending { background: var(--pending-bg); color: var(--pending-ink); }
+        .chip-success { background: var(--success-bg); color: var(--success); }
+        .chip-failed  { background: var(--fail-bg);    color: var(--fail); }
+
+        /* ── CALLOUTS ── */
+        .callout {
+            display: flex;
+            gap: 14px;
+            padding: 16px 18px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .callout p { margin: 0; font-size: 0.9rem; }
+        .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+        /* bordered callout box — Vintage Editorial signature */
+        .callout-rule {
+            background: transparent;
+            border: 2px solid var(--ink);
+            color: var(--ink);
+        }
+
+        .callout-info {
+            background: var(--accent-bg);
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+        }
+
+        .callout-warn {
+            background: var(--pending-bg);
+            border: 1px solid #f0d080;
+            color: var(--pending-ink);
+        }
+
+        .callout-note {
+            background: var(--cream-dark);
+            border: 1px solid var(--cream-border);
+            color: var(--ink-mid);
+        }
+
+        /* ── STEP LISTS ── */
+        ol.steps { list-style: none; counter-reset: steps; margin: 16px 0; }
+
+        ol.steps li {
+            counter-increment: steps;
+            display: flex;
+            gap: 14px;
+            margin-bottom: 14px;
+            align-items: flex-start;
+        }
+
+        ol.steps li::before {
+            content: counter(steps);
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--ink);
+            color: var(--cream);
+            min-width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        ol.steps li span { color: var(--ink-mid); }
+        ol.steps li strong { color: var(--ink); }
+
+        /* ── BULLET LISTS ── */
+        ul.bullets { list-style: none; margin: 14px 0; }
+
+        ul.bullets li {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: var(--ink-mid);
+        }
+
+        ul.bullets li::before {
+            content: '—';
+            color: var(--cream-border);
+            flex-shrink: 0;
+        }
+
+        ul.bullets li strong { color: var(--ink); }
+
+        /* ── CODE ── */
+        code {
+            background: var(--cream-dark);
+            border: 1px solid var(--cream-border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', monospace;
+            font-size: 0.82em;
+            color: var(--ink);
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            background: var(--ink);
+            color: rgba(255,255,255,0.45);
+            padding: 28px 36px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.45);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover { color: #fff; }
+        .site-footer p { font-size: 0.8rem; }
+
+        /* ── REDUCED MOTION ── */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 860px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { position: static; height: auto; }
+            .content { padding: 36px 24px 60px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────── -->
+<header class="site-header">
+    <span class="header-logo">DietReport</span>
+    <span class="header-sep">·</span>
+    <span class="header-doctype">User Guide</span>
+    <nav class="header-links">
+        <a href="../README.md">← README</a>
+        <a href="install.md">Install</a>
+        <a href="architecture.html">Architecture</a>
+    </nav>
+</header>
+
+<div class="layout">
+
+    <!-- ── SIDEBAR ────────────────────────────────────── -->
+    <nav class="sidebar">
+        <div class="sidebar-label">Contents</div>
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li><a href="#first-launch"><span class="sidebar-num">1</span>First Launch</a></li>
+            <li><a href="#home-screen"><span class="sidebar-num">2</span>Home Screen</a></li>
+            <li><a href="#logging"><span class="sidebar-num">3</span>Logging a Meal</a></li>
+            <li><a href="#lock-screen"><span class="sidebar-num">4</span>Focus Lock Screen</a></li>
+            <li><a href="#gallery"><span class="sidebar-num">5</span>Photo Gallery</a></li>
+            <li><a href="#settings"><span class="sidebar-num">6</span>Settings</a></li>
+            <li><a href="#report"><span class="sidebar-num">7</span>Report</a></li>
+            <li><a href="#notifications"><span class="sidebar-num">8</span>Notifications</a></li>
+            <li><a href="#tips"><span class="sidebar-num">9</span>Tips</a></li>
+        </ul>
+    </nav>
+
+    <!-- ── MAIN CONTENT ───────────────────────────────── -->
+    <main class="content">
+
+        <div class="page-title">
+            <h1>User Guide</h1>
+            <p>Everything you need to use DietReport — from first launch to reading your weekly stats.</p>
+        </div>
+
+        <!-- 1 ── FIRST LAUNCH ──────────────────────────── -->
+        <section id="first-launch">
+            <h2><span class="section-num">01.</span> First Launch &amp; Onboarding</h2>
+            <p>When you open DietReport for the first time, the app sends you straight to <strong>Settings</strong> to complete your daily schedule. There is no account required — everything stays on your device.</p>
+            <p>Fill in your schedule, tap <strong>Save</strong>, and reminders start immediately. Every subsequent launch goes straight to <strong>Home</strong>.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Field</th><th>What it means</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Wake time</strong></td><td>When you typically get out of bed (HH:MM)</td></tr>
+                        <tr><td><strong>Bedtime</strong></td><td>When you go to sleep (HH:MM)</td></tr>
+                        <tr><td><strong>First-meal delay</strong></td><td>Minutes after waking before the first reminder fires (0–180)</td></tr>
+                        <tr><td><strong>Ringtone</strong></td><td>Sound played when a reminder notification arrives</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2 ── HOME SCREEN ───────────────────────────── -->
+        <section id="home-screen">
+            <h2><span class="section-num">02.</span> Home Screen</h2>
+            <p>Your daily dashboard. Every meal reminder slot for today is listed here with its current status.</p>
+
+            <h3>Slot cards</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Status</th><th>What it means</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="chip chip-pending">⏳ Pending</span></td>
+                            <td>The 30-minute logging window is open — tap to log now</td>
+                        </tr>
+                        <tr>
+                            <td><span class="chip chip-success">✓ Success</span></td>
+                            <td>You logged a meal photo within the window</td>
+                        </tr>
+                        <tr>
+                            <td><span class="chip chip-failed">✕ Failed</span></td>
+                            <td>The window expired, or you skipped the lock screen early</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Next-meal banner</h3>
+            <p>A banner at the top of the list shows the time of the next upcoming reminder, so you always know when to expect the next prompt.</p>
+
+            <h3>Extra meal button</h3>
+            <p>Tap <strong>+ Log extra meal</strong> to log a meal outside a scheduled slot — useful for unplanned snacks or off-schedule eating.</p>
+
+            <h3>Permission warning banner</h3>
+            <p>If the exact-alarm or notification permission is revoked, a yellow warning banner appears at the top of the screen. Tap <strong>Dismiss</strong> to hide it temporarily; re-granting the permission in system settings clears it permanently.</p>
+        </section>
+
+        <!-- 3 ── LOGGING ───────────────────────────────── -->
+        <section id="logging">
+            <h2><span class="section-num">03.</span> Logging a Meal</h2>
+            <p>The Meal Logging screen opens when you tap a <span class="chip chip-pending">⏳ Pending</span> slot or the <strong>Log meal</strong> action in a reminder notification.</p>
+
+            <h3>Taking a photo</h3>
+            <ol class="steps">
+                <li><span>Grant camera permission when prompted (one-time only).</span></li>
+                <li><span>The camera preview fills the screen.</span></li>
+                <li><span>Tap <strong>Capture</strong> to take a photo with the rear camera.</span></li>
+                <li><span>Review the photo. Tap <strong>Retake</strong> to reshoot, or <strong>Confirm</strong> to save.</span></li>
+            </ol>
+
+            <h3>Picking from gallery</h3>
+            <p>Tap <strong>Gallery</strong> at any point to open the system image picker and choose an existing photo instead of taking a new one. Useful if you already photographed your meal with the regular camera app.</p>
+
+            <h3>The 30-minute window</h3>
+            <div class="callout callout-rule">
+                <span class="callout-icon">⏱</span>
+                <p>A log counts as <strong>Success</strong> only if you tap <strong>Confirm</strong> within <strong>30 minutes</strong> of the scheduled reminder time. After that window, the slot is automatically marked <strong>Failed</strong> — regardless of whether you logged a photo.</p>
+            </div>
+        </section>
+
+        <!-- 4 ── LOCK SCREEN ────────────────────────────── -->
+        <section id="lock-screen">
+            <h2><span class="section-num">04.</span> Focus Lock Screen</h2>
+            <p>After confirming a meal log, the app enters a 10-minute focus period. The idea: eat without your phone.</p>
+
+            <ul class="bullets">
+                <li><strong>Fullscreen.</strong> System bars are hidden for the duration.</li>
+                <li><strong>Screen stays on</strong> for the entire 10-minute countdown.</li>
+                <li><strong>Timer reaches zero</strong> → lock ends, app returns to Home, meal stays <span class="chip chip-success">✓ Success</span>.</li>
+            </ul>
+
+            <h3>Ending the lock early</h3>
+            <p>Tap <strong>Unlock (mark as failed)</strong> or press the system Back button to cancel. This marks the meal as <span class="chip chip-failed">✕ Failed</span>. The same thing happens if you background the app — press Home, switch apps, or pull down the notification shade.</p>
+
+            <div class="callout callout-note">
+                <span class="callout-icon">—</span>
+                <p>This is intentional. The lock screen only benefits you if you actually stay on it.</p>
+            </div>
+        </section>
+
+        <!-- 5 ── GALLERY ────────────────────────────────── -->
+        <section id="gallery">
+            <h2><span class="section-num">05.</span> Photo Gallery</h2>
+            <p>The <strong>Photos</strong> tab shows a scrollable grid of every meal photo you have logged, sorted with the most recent first.</p>
+
+            <ul class="bullets">
+                <li>Tap any photo to view it full-size.</li>
+                <li>Photos are stored locally and are never uploaded anywhere.</li>
+                <li>Uninstalling the app removes all photos.</li>
+            </ul>
+        </section>
+
+        <!-- 6 ── SETTINGS ───────────────────────────────── -->
+        <section id="settings">
+            <h2><span class="section-num">06.</span> Settings</h2>
+            <p>Reached at any time via the <strong>Settings</strong> tab in the bottom navigation bar.</p>
+
+            <h3>Schedule</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Field</th><th>Valid range</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td>Wake time</td><td>HH:MM</td><td>Must be before bedtime</td></tr>
+                        <tr><td>Bedtime</td><td>HH:MM</td><td>Must be after wake time</td></tr>
+                        <tr><td>First-meal delay</td><td>0–180 min</td><td>Offset before the first reminder fires</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">📐</span>
+                <p><strong>How reminders are spaced:</strong> Starting at wake time + delay, a reminder fires every <strong>3 hours</strong> until <strong>2 hours before bedtime</strong>.<br>
+                Example: wake 07:00, delay 30 min, bedtime 23:00 → reminders at 07:30 · 10:30 · 13:30 · 16:30 · 19:30.</p>
+            </div>
+
+            <h3>Notification Sound</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Option</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td>Default</td><td>System default notification tone</td></tr>
+                        <tr><td>Alarm</td><td>Louder alarm-style tone</td></tr>
+                        <tr><td>Notification</td><td>Soft notification chime</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Activity Monitor</h3>
+            <p>When enabled, the app reads your daily phone-usage patterns to automatically infer wake and bedtime, overriding the manual fields. Requires <strong>Usage Access</strong> permission — grant it in System Settings → Privacy → Usage Access.</p>
+
+            <h3>Saving</h3>
+            <p>Tap <strong>Save</strong> to validate and apply all values. A green confirmation card appears briefly on success. The reminder schedule is rebuilt immediately — no restart needed.</p>
+        </section>
+
+        <!-- 7 ── REPORT ─────────────────────────────────── -->
+        <section id="report">
+            <h2><span class="section-num">07.</span> Report</h2>
+            <p>View your meal-logging statistics via the <strong>Report</strong> tab. Toggle between <strong>Weekly</strong> (last 7 days) and <strong>Monthly</strong> (last 30 days).</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Section</th><th>What it shows</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Overall Success</strong></td><td>Your success percentage with a progress bar</td></tr>
+                        <tr><td><strong>By Day</strong></td><td>Per-day breakdown — individual success rate and mini bar</td></tr>
+                        <tr><td><strong>By Hour</strong></td><td>Success rate grouped by the scheduled reminder hour</td></tr>
+                        <tr><td><strong>Time of Day</strong></td><td>Morning (before 12:00) · Afternoon (12–17) · Evening (after 17:00)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>Tap <strong>Share</strong> to generate a plain-text summary and open the Android Sharesheet. A clear-data action is also available to reset your history.</p>
+
+            <div class="callout callout-note">
+                <span class="callout-icon">—</span>
+                <p>A meal counts as Success only if it was logged <em>and</em> the lock screen countdown completed. Exiting the lock screen early marks it Failed.</p>
+            </div>
+        </section>
+
+        <!-- 8 ── NOTIFICATIONS ──────────────────────────── -->
+        <section id="notifications">
+            <h2><span class="section-num">08.</span> Notifications &amp; Reminders</h2>
+            <p>The app uses <code>AlarmManager</code> exact alarms — not vague background jobs — so reminders fire at the precise scheduled time, even in low-power mode (subject to the exact-alarm permission).</p>
+
+            <h3>Notification actions</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Action</th><th>What happens</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Log meal</strong></td><td>Opens the Meal Logging screen for that slot directly</td></tr>
+                        <tr><td><strong>Snooze</strong></td><td>Reschedules the reminder 10 minutes later</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>After a device reboot</h3>
+            <p>The reminder schedule is automatically restored by a boot receiver. You do not need to open the app after restarting your phone.</p>
+
+            <h3>After a timezone change</h3>
+            <p>A receiver detects the change and rebuilds the schedule using your new local time. Crossing a timezone while travelling just works.</p>
+
+            <h3>Exact-alarm permission</h3>
+            <div class="callout callout-warn">
+                <span class="callout-icon">⚠</span>
+                <p>If you deny exact alarms, reminders may fire several minutes late due to Android battery-optimization batching. A warning banner appears on Home.<br><br>
+                To re-grant: <strong>Settings → Apps → DietReport → Permissions → Alarms &amp; reminders → Allow</strong>.</p>
+            </div>
+        </section>
+
+        <!-- 9 ── TIPS ────────────────────────────────────── -->
+        <section id="tips">
+            <h2><span class="section-num">09.</span> Tips &amp; Best Practices</h2>
+            <ul class="bullets">
+                <li><strong>Grant exact alarms.</strong> Late reminders defeat the purpose of timed tracking.</li>
+                <li><strong>Use the Gallery option.</strong> If you already photographed your meal with the regular camera app, pick the existing photo — no retake needed.</li>
+                <li><strong>Stay on the Lock screen.</strong> Backgrounding the app cancels the countdown and marks the meal Failed.</li>
+                <li><strong>Do not clear app data.</strong> This erases your entire meal history and all settings.</li>
+                <li><strong>Keep notifications enabled</strong> for the DietReport channel in system settings, or you will not receive reminders.</li>
+                <li><strong>Log extra meals.</strong> The + button on Home lets you log food outside scheduled slots — it still appears in your gallery and history.</li>
+            </ul>
+        </section>
+
+    </main>
+</div>
+
+<!-- ── FOOTER ───────────────────────────────────────────── -->
+<footer class="site-footer">
+    <div class="footer-links">
+        <a href="../README.md">README</a>
+        <a href="install.md">Install Guide</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="https://github.com/ShaharBarMoshe/DietReport">GitHub</a>
+    </div>
+    <p>DietReport · All data stays on your device</p>
+</footer>
+
+<script>
+    // Highlight active sidebar link as user scrolls through sections
+    const sections  = document.querySelectorAll('section[id]');
+    const navLinks  = document.querySelectorAll('.sidebar-nav a');
+
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            navLinks.forEach(l => l.classList.remove('active'));
+            const match = document.querySelector(`.sidebar-nav a[href="#${entry.target.id}"]`);
+            if (match) match.classList.add('active');
+        });
+    }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+
+    sections.forEach(s => io.observe(s));
+
+    // Set first link active on load
+    if (navLinks.length) navLinks[0].classList.add('active');
+</script>
+</body>
+</html>
